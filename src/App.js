@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Form from './components/Form';
+import Table from './components/Table';
+import EditModal from './components/EditModal';
 
-function App() {
+const App = () => {
+  const [formDataList, setFormDataList] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+
+  const handleFormSubmit = (formData) => {
+    if (editIndex !== null) {
+      // Edit mode
+      const updatedFormDataList = [...formDataList];
+      updatedFormDataList[editIndex] = formData;
+      setFormDataList(updatedFormDataList);
+      setEditIndex(null);
+    } else {
+      // Add mode
+      setFormDataList((prevList) => [...prevList, formData]);
+    }
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+  };
+
+  const handleDelete = (index) => {
+    const updatedFormDataList = [...formDataList];
+    updatedFormDataList.splice(index, 1);
+    setFormDataList(updatedFormDataList);
+  };
+
+  const handleModalClose = () => {
+    setEditIndex(null);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Form onSubmit={handleFormSubmit} />
+      <Table data={formDataList} onEdit={handleEdit} onDelete={handleDelete} />
+      {editIndex !== null && (
+        <EditModal data={formDataList[editIndex]} onSave={handleFormSubmit} onClose={handleModalClose} />
+      )}
     </div>
   );
-}
+};
 
 export default App;
